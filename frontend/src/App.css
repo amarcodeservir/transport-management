@@ -32,8 +32,7 @@
     height: 30px;
     border-radius: 50%;
     background: #f7941d;
-    box-shadow: 1px 0 10px 15px rgba(241, 150, 12, 0.1), 0 4px 6px -2px rgba(240, 205, 7, 0.05);
-    /* Fixed 1px0 -> 1px 0 */
+    box-shadow: none;
     color: white;
     display: flex;
     align-items: center;

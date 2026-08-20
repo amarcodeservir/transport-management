@@ -89,7 +89,7 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="dashboard-layout flex h-screen overflow-hidden bg-slate-50 dark:bg-gray-900" style={getThemeStyle(branding)}>
+    <div className="dashboard-layout flex h-screen overflow-hidden bg-[#F8FAFC] text-slate-800" style={getThemeStyle(branding)}>
       {/* Sidebar handles its own width and responsiveness */}
       <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} branding={branding} />
       

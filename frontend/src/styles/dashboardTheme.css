@@ -165,3 +165,10 @@
   background-color: var(--brand-secondary) !important;
   color: var(--brand-on-secondary) !important;
 }
+
+/* Global Flat Design - Remove all shadows */
+.dashboard-layout *,
+.dashboard-layout ::before,
+.dashboard-layout ::after {
+  box-shadow: none !important;
+}

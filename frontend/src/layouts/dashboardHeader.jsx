@@ -6,21 +6,10 @@ import {
   User,
   ChevronDown,
   Menu,
-  X,
   Settings,
   LogOut,
   HelpCircle,
-  Moon,
-  Sun,
-  MessageCircle,
-  Sparkles,
   Calendar,
-  Download,
-  Plus,
-  Truck,
-  FileText,
-  Users,
-  Receipt,
 } from "lucide-react";
 import { TiThMenu } from "react-icons/ti";
 import { getNotifications, markAllNotificationsRead } from "../services/api.js/notificationService.js";
@@ -28,7 +17,6 @@ import { getNotifications, markAllNotificationsRead } from "../services/api.js/n
 /**
  * Logistics Mitra — Dashboard Header
  * Modern header with search, notifications, user menu, and quick actions.
- * Features: sticky, glass effect, dropdown menus, dark/light mode toggle.
  */
 
 const getInitials = (name) => {
@@ -47,14 +35,9 @@ export default function DashboardHeader({
   onNavigate,
 }) {
   const [scrolled, setScrolled] = useState(false);
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    return saved === "dark" || (!saved && typeof document !== "undefined" && document.documentElement.classList.contains("dark"));
-  });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -65,22 +48,13 @@ export default function DashboardHeader({
   const initials = getInitials(user?.name);
 
   useEffect(() => {
-    setAvatarFailed(false);
-  }, [user?.avatarUrl]);
+    document.documentElement.classList.remove("dark");
+    localStorage.removeItem("theme");
+  }, []);
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
-
-  const toggleDarkMode = () => {
-    setIsDark((prev) => !prev);
-  };
+    setAvatarFailed(false);
+  }, [user?.avatarUrl]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -212,9 +186,8 @@ export default function DashboardHeader({
           dashboard-header sticky top-0 z-40 w-full transition-all duration-300
           ${scrolled
             ? "bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-6px_rgba(27,42,91,0.08)] border-b border-slate-200"
-            : "bg-white border-b border-slate-100"
+            : "bg-white border-b border-slate-200/80"
           }
-          ${isDark ? "dark:bg-gray-900/95 dark:border-gray-700" : ""}
         `}
       >
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
@@ -223,13 +196,13 @@ export default function DashboardHeader({
             {/* Menu toggle */}
             <button
               onClick={onMenuToggle}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
             >
               {isSidebarCollapsed ? <Menu size={20} /> : <TiThMenu size={20} />}
             </button>
 
             <div>
-              <h1 className="text-lg font-bold text-[#1B2A5B] dark:text-white">
+              <h1 className="text-lg font-bold text-[#1B2A5B]">
                 Dashboard
               </h1>
             </div>
@@ -238,15 +211,15 @@ export default function DashboardHeader({
           {/* Center - Search bar */}
           <div className="hidden md:flex flex-1 max-w-md mx-4">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search shipments, clients, invoices..."
-                className="search-input w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-sm text-slate-700 dark:text-gray-200 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[#F7941D] transition-colors"
+                className="search-input w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#F7941D] transition-colors"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-xs text-slate-400 dark:text-gray-500">
-                <span className="px-1 py-0.5 rounded border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-700">⌘</span>
-                <span className="px-1 py-0.5 rounded border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-700">K</span>
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-xs text-slate-400">
+                <span className="px-1 py-0.5 rounded border border-slate-200 bg-white">⌘</span>
+                <span className="px-1 py-0.5 rounded border border-slate-200 bg-white">K</span>
               </kbd>
             </div>
           </div>
@@ -254,37 +227,22 @@ export default function DashboardHeader({
           {/* Right section - Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Time */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-gray-800 text-sm text-slate-600 dark:text-gray-300">
-              <Calendar size={14} className="text-slate-400 dark:text-gray-500" />
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 text-sm text-slate-600">
+              <Calendar size={14} className="text-slate-400" />
               <span>{currentTime}</span>
             </div>
-
-            {/* Dark / Light Theme Toggle */}
-            <button
-              type="button"
-              onClick={toggleDarkMode}
-              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-            >
-              {isDark ? (
-                <Sun size={18} className="text-amber-400" />
-              ) : (
-                <Moon size={18} className="text-slate-600 dark:text-gray-300" />
-              )}
-            </button>
 
             {/* Notifications */}
             <div className="relative">
               <button
                 id="notifications-btn"
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors"
+                className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                <Bell size={18} className="text-slate-600 dark:text-gray-300" />
+                <Bell size={18} className="text-slate-600" />
                 {unreadNotifications > 0 && (
                   <>
-                    <span className="notification-badge absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" />
+                    <span className="notification-badge absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
                     <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 animate-ping opacity-75" />
                   </>
                 )}
@@ -294,23 +252,23 @@ export default function DashboardHeader({
               {isNotificationsOpen && (
                 <div
                   id="notifications-dropdown"
-                  className="dropdown-animate absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-slate-200 dark:border-gray-700 overflow-hidden z-50"
+                  className="dropdown-animate absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
                 >
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-gray-700">
-                    <h3 className="font-semibold text-slate-700 dark:text-white">Notifications</h3>
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                    <h3 className="font-semibold text-slate-700">Notifications</h3>
                     <button disabled={!unreadNotifications} onClick={readAllNotifications} className="text-xs text-[#F7941D] hover:underline disabled:opacity-40">Mark all read</button>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
                     {notifications.slice(0, 5).map((notif) => {
                       const Icon = Bell;
                       return (
-                        <button type="button" onClick={() => { setIsNotificationsOpen(false); onNavigate?.(notif.link || "/dashboard/notifications"); }} key={notif.id} className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-colors border-b border-slate-50 dark:border-gray-700/50 last:border-0 ${!notif.is_read ? "bg-orange-50/40" : ""}`}>
-                          <div className="rounded-lg bg-slate-100 p-2 text-orange-500 dark:bg-gray-700">
+                        <button type="button" onClick={() => { setIsNotificationsOpen(false); onNavigate?.(notif.link || "/dashboard/notifications"); }} key={notif.id} className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${!notif.is_read ? "bg-orange-50/40" : ""}`}>
+                          <div className="rounded-lg bg-slate-100 p-2 text-orange-500">
                             <Icon size={14} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-slate-700 dark:text-gray-200">{notif.title}</p>
-                            <p className="truncate text-xs text-slate-400 dark:text-gray-500">{notif.message}</p>
+                            <p className="text-sm text-slate-700">{notif.title}</p>
+                            <p className="truncate text-xs text-slate-400">{notif.message}</p>
                             <p className="text-[11px] text-slate-400">{notif.created_at ? new Date(notif.created_at).toLocaleString("en-IN") : ""}</p>
                           </div>
                         </button>
@@ -318,7 +276,7 @@ export default function DashboardHeader({
                     })}
                     {!notifications.length && <div className="px-4 py-8 text-center text-sm text-slate-400">No notifications</div>}
                   </div>
-                  <div className="px-4 py-2 border-t border-slate-100 dark:border-gray-700 text-center">
+                  <div className="px-4 py-2 border-t border-slate-100 text-center">
                     <button onClick={() => onNavigate?.("/dashboard/notifications")} className="text-sm text-[#F7941D] hover:underline font-medium">View all notifications</button>
                   </div>
                 </div>
@@ -333,7 +291,7 @@ export default function DashboardHeader({
                 aria-label={`Open profile menu for ${displayName}`}
                 aria-expanded={isUserMenuOpen}
                 title={displayName}
-                className="profile-menu-button flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5 pl-2 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-800"
+                className="profile-menu-button flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5 pl-2 shadow-sm transition-colors hover:bg-slate-50"
               >
                 {user?.avatarUrl && !avatarFailed ? (
                   <img
@@ -348,21 +306,21 @@ export default function DashboardHeader({
                   </div>
                 )}
                 <div className="hidden text-left xl:block pr-1">
-                  <p className="max-w-[120px] truncate text-xs font-bold text-slate-700 dark:text-gray-100">{displayName}</p>
+                  <p className="max-w-[120px] truncate text-xs font-bold text-slate-700">{displayName}</p>
                   <p className="max-w-[120px] truncate text-[11px] text-slate-400 capitalize">{normalizedRole.replace(/_/g, " ")}</p>
                 </div>
-                <ChevronDown size={14} className="text-slate-400 dark:text-gray-400" />
+                <ChevronDown size={14} className="text-slate-400" />
               </button>
 
               {/* User Dropdown */}
               {isUserMenuOpen && (
                 <div
                   id="user-menu-dropdown"
-                  className="dropdown-animate absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-slate-200 dark:border-gray-700 overflow-hidden z-50"
+                  className="dropdown-animate absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
                 >
-                  <div className="px-4 py-3 border-b border-slate-100 dark:border-gray-700">
-                    <p className="text-sm font-semibold text-slate-700 dark:text-white truncate">{displayName}</p>
-                    <p className="text-xs text-slate-400 dark:text-gray-400 truncate">{displayEmail}</p>
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <p className="text-sm font-semibold text-slate-700 truncate">{displayName}</p>
+                    <p className="text-xs text-slate-400 truncate">{displayEmail}</p>
                   </div>
                   <div className="py-1">
                     {userMenuItems.map((item) => {
@@ -375,20 +333,20 @@ export default function DashboardHeader({
                             setIsUserMenuOpen(false);
                             onNavigate?.(item.to);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-colors"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                         >
-                          <Icon size={16} className="text-slate-400 dark:text-gray-500" />
+                          <Icon size={16} className="text-slate-400" />
                           {item.label}
                         </button>
                       );
                     })}
                   </div>
-                  <div className="border-t border-slate-100 dark:border-gray-700 py-1">
+                  <div className="border-t border-slate-100 py-1">
                     <button
                       type="button"
                       disabled={loggingOut}
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-60"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60"
                     >
                       <LogOut size={16} />
                       {loggingOut ? "Logging out..." : "Log out"}

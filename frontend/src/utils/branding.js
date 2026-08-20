@@ -1,20 +1,26 @@
 export const DEFAULT_BRANDING = {
-  name: "Globalex Logistics",
-  browser_title: "Globalex Logistics - Reliable Transport",
+  name: "Difmo Logistics",
+  browser_title: "Difmo Logistics - Transport & Logistics Management",
   logo: "/logo.png",
   favicon: "/logo.png",
-  primary_color: "#0E60A8",
-  secondary_color: "#0A2342",
-  accent_color: "#F7941D",
+  primary_color: "#F7941D",
+  secondary_color: "#1B2A5B",
+  accent_color: "#2563EB",
   sidebar_color: "#FFFFFF",
   is_default: true,
 };
 
 export const THEME_PRESETS = [
   {
-    name: "Globalex Ocean & Sun",
+    name: "Difmo Sunset & Navy (Default)",
+    primary_color: "#F7941D",
+    secondary_color: "#1B2A5B",
+    accent_color: "#2563EB",
+  },
+  {
+    name: "Ocean & Sun",
     primary_color: "#0E60A8",
-    secondary_color: "#0A2342",
+    secondary_color: "#1B2A5B",
     accent_color: "#F7941D",
   },
   {
