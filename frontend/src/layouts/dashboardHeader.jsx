@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 /* eslint-disable react/prop-types, no-unused-vars */
 import {
   Bell,
@@ -23,17 +23,12 @@ import {
   Receipt,
 } from "lucide-react";
 import { TiThMenu } from "react-icons/ti";
-import React from 'react'
 import { getNotifications, markAllNotificationsRead } from "../services/api.js/notificationService.js";
 
 /**
  * Logistics Mitra — Dashboard Header
  * Modern header with search, notifications, user menu, and quick actions.
  * Features: sticky, glass effect, dropdown menus, dark/light mode toggle.
- *
- * `user` is now a real prop: { name, email, avatarUrl? } — pass the logged-in
- * user's data from your auth context/store. `onLogout` and `onNavigate` let
- * the parent wire up real actions instead of hardcoded links.
  */
 
 const getInitials = (name) => {
@@ -52,7 +47,10 @@ export default function DashboardHeader({
   onNavigate,
 }) {
   const [scrolled, setScrolled] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    return saved === "dark" || (!saved && typeof document !== "undefined" && document.documentElement.classList.contains("dark"));
+  });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -69,6 +67,20 @@ export default function DashboardHeader({
   useEffect(() => {
     setAvatarFailed(false);
   }, [user?.avatarUrl]);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
+
+  const toggleDarkMode = () => {
+    setIsDark((prev) => !prev);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -89,15 +101,18 @@ export default function DashboardHeader({
     };
     loadNotifications();
     const interval = setInterval(loadNotifications, 30000);
-    return () => { active = false; clearInterval(interval); };
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Update current time
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
       setCurrentTime(`${hours}:${minutes}`);
     };
     updateTime();
@@ -109,28 +124,23 @@ export default function DashboardHeader({
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (isNotificationsOpen) {
-        const notifBtn = document.getElementById('notifications-btn');
-        const notifDropdown = document.getElementById('notifications-dropdown');
+        const notifBtn = document.getElementById("notifications-btn");
+        const notifDropdown = document.getElementById("notifications-dropdown");
         if (notifBtn && !notifBtn.contains(e.target) && notifDropdown && !notifDropdown.contains(e.target)) {
           setIsNotificationsOpen(false);
         }
       }
       if (isUserMenuOpen) {
-        const userBtn = document.getElementById('user-menu-btn');
-        const userDropdown = document.getElementById('user-menu-dropdown');
+        const userBtn = document.getElementById("user-menu-btn");
+        const userDropdown = document.getElementById("user-menu-dropdown");
         if (userBtn && !userBtn.contains(e.target) && userDropdown && !userDropdown.contains(e.target)) {
           setIsUserMenuOpen(false);
         }
       }
     };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [isNotificationsOpen, isUserMenuOpen]);
-
-  const toggleDarkMode = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
 
   const handleLogout = async () => {
     if (!onLogout) {
@@ -201,10 +211,10 @@ export default function DashboardHeader({
         className={`
           dashboard-header sticky top-0 z-40 w-full transition-all duration-300
           ${scrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-6px_rgba(27,42,91,0.08)] border-b border-slate-200'
-            : 'bg-white border-b border-slate-100'
+            ? "bg-white/95 backdrop-blur-md shadow-[0_4px_20px_-6px_rgba(27,42,91,0.08)] border-b border-slate-200"
+            : "bg-white border-b border-slate-100"
           }
-          ${isDark ? 'dark:bg-gray-900/95 dark:border-gray-700' : ''}
+          ${isDark ? "dark:bg-gray-900/95 dark:border-gray-700" : ""}
         `}
       >
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
@@ -213,7 +223,7 @@ export default function DashboardHeader({
             {/* Menu toggle */}
             <button
               onClick={onMenuToggle}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               {isSidebarCollapsed ? <Menu size={20} /> : <TiThMenu size={20} />}
             </button>
@@ -222,7 +232,6 @@ export default function DashboardHeader({
               <h1 className="text-lg font-bold text-[#1B2A5B] dark:text-white">
                 Dashboard
               </h1>
-
             </div>
           </div>
 
@@ -244,15 +253,26 @@ export default function DashboardHeader({
 
           {/* Right section - Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Quick action buttons */}
-
-
             {/* Time */}
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-gray-800 text-sm text-slate-600 dark:text-gray-300">
               <Calendar size={14} className="text-slate-400 dark:text-gray-500" />
               <span>{currentTime}</span>
             </div>
 
+            {/* Dark / Light Theme Toggle */}
+            <button
+              type="button"
+              onClick={toggleDarkMode}
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+            >
+              {isDark ? (
+                <Sun size={18} className="text-amber-400" />
+              ) : (
+                <Moon size={18} className="text-slate-600 dark:text-gray-300" />
+              )}
+            </button>
 
             {/* Notifications */}
             <div className="relative">
@@ -262,7 +282,12 @@ export default function DashboardHeader({
                 className="relative p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors"
               >
                 <Bell size={18} className="text-slate-600 dark:text-gray-300" />
-                {unreadNotifications > 0 && <><span className="notification-badge absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" /><span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 animate-ping opacity-75" /></>}
+                {unreadNotifications > 0 && (
+                  <>
+                    <span className="notification-badge absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" />
+                    <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 animate-ping opacity-75" />
+                  </>
+                )}
               </button>
 
               {/* Notifications dropdown */}
@@ -318,14 +343,18 @@ export default function DashboardHeader({
                     className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
                   />
                 ) : (
-                  <div className="profile-avatar flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm">
-                    {initials === "?" ? <User size={16} /> : initials}
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1B2A5B] text-xs font-bold text-white">
+                    {initials}
                   </div>
                 )}
-                <ChevronDown size={16} className={`profile-menu-chevron mr-0.5 shrink-0 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`} />
+                <div className="hidden text-left xl:block pr-1">
+                  <p className="max-w-[120px] truncate text-xs font-bold text-slate-700 dark:text-gray-100">{displayName}</p>
+                  <p className="max-w-[120px] truncate text-[11px] text-slate-400 capitalize">{normalizedRole.replace(/_/g, " ")}</p>
+                </div>
+                <ChevronDown size={14} className="text-slate-400 dark:text-gray-400" />
               </button>
 
-              {/* User dropdown */}
+              {/* User Dropdown */}
               {isUserMenuOpen && (
                 <div
                   id="user-menu-dropdown"
@@ -340,6 +369,7 @@ export default function DashboardHeader({
                       const Icon = item.icon;
                       return (
                         <button
+                          type="button"
                           key={item.label}
                           onClick={() => {
                             setIsUserMenuOpen(false);
@@ -355,12 +385,13 @@ export default function DashboardHeader({
                   </div>
                   <div className="border-t border-slate-100 dark:border-gray-700 py-1">
                     <button
-                      onClick={handleLogout}
+                      type="button"
                       disabled={loggingOut}
+                      onClick={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-60"
                     >
                       <LogOut size={16} />
-                      {loggingOut ? "Logging out..." : "Logout"}
+                      {loggingOut ? "Logging out..." : "Log out"}
                     </button>
                   </div>
                 </div>
@@ -368,32 +399,6 @@ export default function DashboardHeader({
             </div>
           </div>
         </div>
-
-        {/* Mobile menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 shadow-lg">
-            <div className="p-4 space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-sm focus:outline-none focus:border-[#F7941D]"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#F7941D] to-[#E8831A] text-white text-sm font-semibold">
-                  <Plus size={16} />
-                  New Shipment
-                </button>
-                <button className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-gray-700 text-slate-600 dark:text-gray-300 text-sm font-semibold">
-                  <Download size={16} />
-                  Export
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
     </>
   );
