@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const fuelLogSchema = new mongoose.Schema(
   {
     vehicle_id: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle", required: true, index: true },
+    
     driver_id: { type: mongoose.Schema.Types.ObjectId, ref: "Driver", default: null, index: true },
     organization_id: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", required: true, index: true },
     fuel_date: { type: Date, required: true, default: Date.now },

@@ -12,7 +12,7 @@ export const getCustomerById = async (id) => {
   return response.data;
 };
 
-// Create new customer
+// Create new customers
 export const createCustomer = async (customerData) => {
   const response = await api.post("/customers", customerData);
   return response.data;
