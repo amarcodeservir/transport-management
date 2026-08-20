@@ -1,0 +1,13 @@
+import express from "express";
+import { verifyToken, authorizeRoles } from "../middlelware/authMiddleware.js";
+import { getPayments, getPaymentInvoices, createPayment, updatePayment, deletePayment } from "../controllers/paymentController.js";
+const router = express.Router();
+router.use(verifyToken);
+const adminRoles = authorizeRoles("super_admin", "organization_admin");
+const payableRoles = authorizeRoles("super_admin", "organization_admin", "customer");
+router.get("/", adminRoles, getPayments);
+router.get("/invoices", payableRoles, getPaymentInvoices);
+router.post("/", payableRoles, createPayment);
+router.put("/:id", adminRoles, updatePayment);
+router.delete("/:id", adminRoles, deletePayment);
+export default router;

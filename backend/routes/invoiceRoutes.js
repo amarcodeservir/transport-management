@@ -1,0 +1,14 @@
+import express from "express";
+import { verifyToken, authorizeRoles } from "../middlelware/authMiddleware.js";
+import { getInvoices, getInvoiceById, getInvoiceTemplate, getInvoiceShipments, createInvoice, updateInvoiceStatus } from "../controllers/invoiceController.js";
+const router = express.Router();
+router.use(verifyToken);
+const roles = authorizeRoles("super_admin", "organization_admin");
+const readRoles = authorizeRoles("super_admin", "organization_admin", "customer");
+router.get("/", roles, getInvoices);
+router.get("/shipments", roles, getInvoiceShipments);
+router.post("/", roles, createInvoice);
+router.get("/:id/template", readRoles, getInvoiceTemplate);
+router.get("/:id", readRoles, getInvoiceById);
+router.patch("/:id/status", roles, updateInvoiceStatus);
+export default router;

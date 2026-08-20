@@ -1,0 +1,12 @@
+import express from "express";
+import { verifyToken, authorizeRoles } from "../middlelware/authMiddleware.js";
+import { handlePodUpload } from "../middlelware/podUpload.js";
+import { getDeliveries, submitDeliveryPod, updateDeliveryStatus, viewDeliveryPod } from "../controllers/podController.js";
+const router = express.Router();
+router.use(verifyToken);
+const roles = authorizeRoles("super_admin", "organization_admin", "driver");
+router.get("/deliveries", roles, getDeliveries);
+router.get("/files/:filename", roles, viewDeliveryPod);
+router.post("/:id/submit", roles, handlePodUpload, submitDeliveryPod);
+router.patch("/:id/status", roles, updateDeliveryStatus);
+export default router;

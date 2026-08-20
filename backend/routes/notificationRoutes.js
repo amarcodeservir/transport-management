@@ -1,0 +1,10 @@
+import express from "express";
+import { verifyToken, authorizeRoles } from "../middlelware/authMiddleware.js";
+import { getNotifications, createNotification, markNotificationRead, markAllNotificationsRead } from "../controllers/notificationController.js";
+const router = express.Router();
+router.use(verifyToken);
+router.get("/", getNotifications);
+router.patch("/read-all", markAllNotificationsRead);
+router.patch("/:id/read", markNotificationRead);
+router.post("/", authorizeRoles("super_admin", "organization_admin"), createNotification);
+export default router;
